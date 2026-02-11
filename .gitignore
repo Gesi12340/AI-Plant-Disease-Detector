@@ -1,0 +1,27 @@
+# Datasets
+dataset_repo/
+dataset/
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Flutter/Android/builds (Specifics are usually in mobile_app/.gitignore but good to be safe)
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Models (Optional: Keep small TFLite, ignore large training checkpoints if needed)
+# *.h5
+# *.checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.iml
