@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/classifier_service.dart';
@@ -10,6 +10,7 @@ import '../services/sync_service.dart';
 import 'result_screen.dart';
 import 'history_screen.dart';
 import 'education_screen.dart';
+import '../services/locale_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -169,6 +170,17 @@ class _HomeScreenState extends State<HomeScreen>
                               context,
                               MaterialPageRoute(builder: (c) => const HistoryScreen()),
                             );
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        _GlassIconButton(
+                          icon: Icons.language_rounded,
+                          onTap: () {
+                            final currentLocale = LocaleController.localeNotifier.value;
+                            final newLocale = currentLocale.languageCode == 'en' 
+                                ? const Locale('sw') 
+                                : const Locale('en');
+                            LocaleController.setLocale(newLocale);
                           },
                         ),
                       ],
