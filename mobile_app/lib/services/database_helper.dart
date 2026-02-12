@@ -13,17 +13,25 @@ class DatabaseHelper {
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  Future _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 2, onCreate: _createDB, onUpgrade: _onUpgrade);
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE scans ADD COLUMN isSynced INTEGER DEFAULT 0');
+      await _createTreatmentsTable(db);
+    }
   }
 
   Future _createDB(Database db, int version) async {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const textType = 'TEXT NOT NULL';
     const realType = 'REAL NOT NULL';
+    const intType = 'INTEGER NOT NULL';
 
     await db.execute('''
 CREATE TABLE scans ( 
@@ -32,14 +40,72 @@ CREATE TABLE scans (
   diseaseName $textType,
   confidence $realType,
   severity $realType,
-  timestamp $textType
+  timestamp $textType,
+  isSynced $intType DEFAULT 0
   )
 ''');
+
+    await _createTreatmentsTable(db);
+  }
+
+  Future _createTreatmentsTable(Database db) async {
+    await db.execute('''
+CREATE TABLE treatments (
+  _id INTEGER PRIMARY KEY AUTOINCREMENT,
+  diseaseName TEXT NOT NULL,
+  chemical TEXT NOT NULL,
+  organic TEXT NOT NULL
+)
+''');
+    // Pre-populate with sample data
+    await _insertSampleTreatments(db);
+  }
+
+  Future _insertSampleTreatments(Database db) async {
+    final treatments = [
+      {
+        'diseaseName': 'Tomato Early Blight',
+        'chemical': 'Apply chlorothalonil or copper-based fungicide every 7-10 days.',
+        'organic': 'Improve air circulation, use mulch, and apply neem oil.'
+      },
+      {
+        'diseaseName': 'Potato Late Blight',
+        'chemical': 'Use systemic fungicides like metalaxyl-M.',
+        'organic': 'Remove infected plants immediately and use resistant varieties.'
+      },
+      {
+        'diseaseName': 'Healthy',
+        'chemical': 'No chemical treatment needed.',
+        'organic': 'Continue regular watering and fertilization.'
+      }
+    ];
+
+    for (var t in treatments) {
+      await db.insert('treatments', t);
+    }
   }
 
   Future<int> create(ScanResult scan) async {
     final db = await instance.database;
     return await db.insert('scans', scan.toMap());
+  }
+
+  Future<Map<String, String>?> getTreatment(String diseaseName) async {
+    final db = await instance.database;
+    final maps = await db.query(
+      'treatments',
+      columns: ['chemical', 'organic'],
+      where: 'diseaseName = ?',
+      whereArgs: [diseaseName],
+    );
+
+    if (maps.isNotEmpty) {
+      return {
+        'chemical': maps.first['chemical'] as String,
+        'organic': maps.first['organic'] as String,
+      };
+    }
+    return null;
   }
 
   Future<List<ScanResult>> readAllScans() async {
@@ -48,6 +114,22 @@ CREATE TABLE scans (
     final result = await db.query('scans', orderBy: orderBy);
 
     return result.map((json) => ScanResult.fromJson(json)).toList();
+  }
+
+  Future<List<ScanResult>> getUnsyncedScans() async {
+    final db = await instance.database;
+    final result = await db.query('scans', where: 'isSynced = 0');
+    return result.map((json) => ScanResult.fromJson(json)).toList();
+  }
+
+  Future<int> markAsSynced(int id) async {
+    final db = await instance.database;
+    return await db.update(
+      'scans',
+      {'isSynced': 1},
+      where: '_id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future close() async {
@@ -63,6 +145,7 @@ class ScanResult {
   final double confidence;
   final double severity;
   final DateTime timestamp;
+  final bool isSynced;
 
   ScanResult({
     this.id,
@@ -71,6 +154,7 @@ class ScanResult {
     required this.confidence,
     required this.severity,
     required this.timestamp,
+    this.isSynced = false,
   });
 
   Map<String, Object?> toMap() => {
@@ -80,6 +164,7 @@ class ScanResult {
         'confidence': confidence,
         'severity': severity,
         'timestamp': timestamp.toIso8601String(),
+        'isSynced': isSynced ? 1 : 0,
       };
 
   static ScanResult fromJson(Map<String, Object?> json) => ScanResult(
@@ -89,5 +174,6 @@ class ScanResult {
         confidence: json['confidence'] as double,
         severity: json['severity'] as double,
         timestamp: DateTime.parse(json['timestamp'] as String),
+        isSynced: (json['isSynced'] as int?) == 1,
       );
 }

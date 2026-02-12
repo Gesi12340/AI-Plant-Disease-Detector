@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/classifier_service.dart';
 import '../services/database_helper.dart';
+import '../services/sync_service.dart';
 import 'result_screen.dart';
 import 'history_screen.dart';
 import 'education_screen.dart';
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _classifierService.loadModel();
     _loadUserName();
+    SyncService.instance.performSync();
   }
 
   String _userName = "Farmer";
@@ -77,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plant Doctor 🌱'),
+        title: Text(AppLocalizations.of(context)!.appTitle),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -98,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Detect Plant Diseases\nInstantly',
+              AppLocalizations.of(context)!.scanSubtitle,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -113,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ElevatedButton.icon(
                     onPressed: () => _pickImage(ImageSource.camera),
                     icon: const Icon(Icons.camera_alt),
-                    label: const Text('Take a Photo'),
+                    label: Text(AppLocalizations.of(context)!.scanPlant),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 15),
@@ -147,11 +150,33 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (c) => const HistoryScreen()));
-        },
-        child: const Icon(Icons.history),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: 'syncBtn',
+            onPressed: () async {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(AppLocalizations.of(context)!.startSync)),
+              );
+              await SyncService.instance.performSync();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(AppLocalizations.of(context)!.syncComplete)),
+                );
+              }
+            },
+            child: const Icon(Icons.sync),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            heroTag: 'historyBtn',
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (c) => const HistoryScreen()));
+            },
+            child: const Icon(Icons.history),
+          ),
+        ],
       ),
     );
   }

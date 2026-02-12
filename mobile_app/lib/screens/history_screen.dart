@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../services/database_helper.dart';
 
@@ -29,7 +29,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Disease Trends'),
+        title: Text(AppLocalizations.of(context)!.diseaseTrends),
       ),
       body: Column(
         children: [
@@ -41,7 +41,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               future: _scansFuture,
               builder: (context, snapshot) {
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("No data for chart"));
+                  return Center(child: Text(AppLocalizations.of(context)!.noDataChart));
                 }
                 final data = snapshot.data!;
                 // Simplified: Plot severity over time (index)
@@ -78,7 +78,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("No history yet"));
+                  return Center(child: Text(AppLocalizations.of(context)!.noHistory));
                 }
 
                 return ListView.builder(

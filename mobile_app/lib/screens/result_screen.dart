@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import '../services/database_helper.dart';
 
 class ResultScreen extends StatelessWidget {
   final File imageFile;
@@ -16,7 +18,7 @@ class ResultScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Diagnosis Result'),
+        title: Text(AppLocalizations.of(context)!.diagnosisResult),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -33,7 +35,7 @@ class ResultScreen extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  Positioned(
+                   Positioned(
                     bottom: 0,
                     left: 0,
                     right: 0,
@@ -75,9 +77,9 @@ class ResultScreen extends StatelessWidget {
                         percent: confidence,
                         center: Text("${(confidence * 100).toStringAsFixed(1)}%"),
                         progressColor: Colors.green,
-                        footer: const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Text("Confidence"),
+                        footer: Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(AppLocalizations.of(context)!.confidence),
                         ),
                       ),
                       CircularPercentIndicator(
@@ -86,45 +88,71 @@ class ResultScreen extends StatelessWidget {
                         percent: severity / 100,
                         center: Text("${severity.toStringAsFixed(1)}%"),
                         progressColor: Colors.red,
-                        footer: const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Text("Severity"),
+                        footer: Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(AppLocalizations.of(context)!.severity),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Card(
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
+                  FutureBuilder<Map<String, String>?>(
+                    future: DatabaseHelper.instance.getTreatment(label),
+                    builder: (context, snapshot) {
+                      final treatment = snapshot.data;
+                      return Card(
+                        elevation: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.medical_services, color: Colors.blue),
-                              SizedBox(width: 8),
-                              Text(
-                                "Treatment Recommendation",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.medical_services, color: Colors.blue),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    AppLocalizations.of(context)!.treatmentRecommendation,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
+                              const Divider(),
+                              if (snapshot.connectionState == ConnectionState.waiting)
+                                const Center(child: CircularProgressIndicator())
+                              else if (treatment != null) ...[
+                                Text(
+                                  "Organic Remedie:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green[700],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(treatment['organic']!),
+                                const SizedBox(height: 12),
+                                Text(
+                                  "Chemical Treatment:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue[700],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(treatment['chemical']!),
+                              ] else ...[
+                                Text(label.contains("Healthy")
+                                    ? AppLocalizations.of(context)!.healthyPlantMessage
+                                    : AppLocalizations.of(context)!.infectedPlantMessage),
+                              ],
                             ],
                           ),
-                          const Divider(),
-                          // Placeholder logic for recommendations
-                          if (label.contains("Healthy"))
-                            const Text(
-                                "No treatment needed. Keep maintaining good practices!")
-                          else
-                            const Text(
-                                "1. Remove infected leaves immediately.\n2. Apply copper-based fungicide.\n3. Ensure better air circulation."),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

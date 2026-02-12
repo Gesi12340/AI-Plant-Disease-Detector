@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EducationScreen extends StatelessWidget {
   const EducationScreen({super.key});
@@ -9,11 +10,11 @@ class EducationScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Plant Education'),
-          bottom: const TabBar(
+          title: Text(AppLocalizations.of(context)!.educationTitle),
+          bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.book), text: 'Learn'),
-              Tab(icon: Icon(Icons.quiz), text: 'Quiz'),
+              Tab(icon: const Icon(Icons.book), text: AppLocalizations.of(context)!.learnTab),
+              Tab(icon: const Icon(Icons.quiz), text: AppLocalizations.of(context)!.quizTab),
             ],
           ),
         ),
@@ -64,7 +65,7 @@ class LearnTab extends StatelessWidget {
               d["name"]!,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: const Text("Tap to learn more"),
+            subtitle: Text(AppLocalizations.of(context)!.tapToLearn),
             leading: const Icon(Icons.grass, color: Colors.green),
             children: [
               Padding(
@@ -72,13 +73,13 @@ class LearnTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Symptoms:",
+                    Text(AppLocalizations.of(context)!.symptoms,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold)),
                     Text(d["symptoms"]!),
                     const SizedBox(height: 10),
-                    Text("Prevention:",
+                    Text(AppLocalizations.of(context)!.prevention,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold)),
@@ -151,17 +152,17 @@ class _QuizTabState extends State<QuizTab> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Quiz Completed!',
+              AppLocalizations.of(context)!.quizCompleted,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
-              'Score: $_score / ${_questions.length}',
+              '${AppLocalizations.of(context)!.score} $_score / ${_questions.length}',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _resetQuiz,
-              child: const Text('Restart Quiz'),
+              child: Text(AppLocalizations.of(context)!.restartQuiz),
             )
           ],
         ),
@@ -180,7 +181,7 @@ class _QuizTabState extends State<QuizTab> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Question ${_questionIndex + 1}/${_questions.length}',
+            '${AppLocalizations.of(context)!.question} ${_questionIndex + 1}/${_questions.length}',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
