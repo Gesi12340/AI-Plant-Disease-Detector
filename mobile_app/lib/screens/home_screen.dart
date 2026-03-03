@@ -10,7 +10,9 @@ import '../services/sync_service.dart';
 import 'result_screen.dart';
 import 'history_screen.dart';
 import 'education_screen.dart';
+import 'chatbot_screen.dart';
 import '../services/locale_controller.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,6 +92,16 @@ class _HomeScreenState extends State<HomeScreen>
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ChatbotScreen()),
+        ),
+        backgroundColor: const Color(0xFF2E7D32),
+        elevation: 8,
+        label: const Text('AI Assistant', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        icon: const Icon(Icons.smart_toy_rounded, color: Colors.white),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -286,13 +298,53 @@ class _HomeScreenState extends State<HomeScreen>
                           const SizedBox(height: 24),
 
                           // Feature Cards Row
+                          // Featured Carousel
+                          Container(
+                            height: 160,
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 24),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(28),
+                              image: const DecorationImage(
+                                image: AssetImage('assets/images/maize_streak_virus.png'),
+                                fit: BoxFit.cover,
+                                opacity: 0.6,
+                              ),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(28),
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(20),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Protect Your Crops',
+                                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    'Learn how to identify and treat MSV in Maize',
+                                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
                           Row(
                             children: [
                               Expanded(
                                 child: _FeatureCard(
                                   icon: Icons.school_rounded,
                                   title: 'Education',
-                                  subtitle: 'Learn about diseases',
+                                  subtitle: 'Disease library',
                                   color: const Color(0xFF1565C0),
                                   onTap: () {
                                     Navigator.push(
@@ -307,9 +359,9 @@ class _HomeScreenState extends State<HomeScreen>
                               const SizedBox(width: 14),
                               Expanded(
                                 child: _FeatureCard(
-                                  icon: Icons.bar_chart_rounded,
-                                  title: AppLocalizations.of(context)!.history,
-                                  subtitle: AppLocalizations.of(context)!.historySubtitle,
+                                  icon: Icons.history_rounded,
+                                  title: 'History',
+                                  subtitle: 'Past scans',
                                   color: const Color(0xFFEF6C00),
                                   onTap: () {
                                     Navigator.push(
@@ -323,6 +375,22 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                             ],
                           ),
+                          const SizedBox(height: 14),
+                          _FeatureCard(
+                            icon: Icons.smart_toy_rounded,
+                            title: 'AI Expert Helper',
+                            subtitle: 'Get instant agricultural advice from our AI',
+                            color: const Color(0xFF7B1FA2),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChatbotScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 32),
                           const SizedBox(height: 14),
 
                           // Sync Status Card
@@ -498,48 +566,58 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: color, size: 24),
                 ),
-                child: Icon(icon, color: color, size: 24),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                const SizedBox(height: 14),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

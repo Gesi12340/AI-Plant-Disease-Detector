@@ -16,8 +16,10 @@ class ResultScreen extends StatelessWidget {
     final String label = result['label'];
     final double confidence = result['confidence'];
     final double severity = result['severity'];
-    final bool isHealthy = label.contains("Healthy");
+    final bool isHealthy = label.toLowerCase().contains("healthy");
+    final bool isUnknown = label.toLowerCase().contains("unknown");
     final colorScheme = Theme.of(context).colorScheme;
+
 
     return Scaffold(
       body: CustomScrollView(
@@ -26,7 +28,9 @@ class ResultScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: isHealthy ? const Color(0xFF2E7D32) : const Color(0xFFC62828),
+            backgroundColor: isUnknown 
+                ? Colors.blueGrey 
+                : (isHealthy ? const Color(0xFF2E7D32) : const Color(0xFFC62828)),
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(6),
@@ -67,11 +71,15 @@ class ResultScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isHealthy ? Colors.green : Colors.red,
+                            color: isUnknown 
+                                ? Colors.blueGrey 
+                                : (isHealthy ? Colors.green : Colors.red),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            isHealthy ? '✅ Healthy' : '⚠️ Disease Detected',
+                            isUnknown 
+                                ? '❓ Unclear Scan' 
+                                : (isHealthy ? '✅ Healthy' : '⚠️ Disease Detected'),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -139,9 +147,11 @@ class ResultScreen extends StatelessWidget {
                           _TreatmentCard(
                             title: '🌿 Organic Remedy',
                             content: treatment?['organic'],
-                            fallback: isHealthy 
-                                ? AppLocalizations.of(context)!.healthyPlantMessage
-                                : AppLocalizations.of(context)!.infectedPlantMessage,
+                            fallback: isUnknown
+                                ? "Please ensure the leaf is well-lit and clearly visible in the frame."
+                                : (isHealthy 
+                                    ? AppLocalizations.of(context)!.healthyPlantMessage
+                                    : AppLocalizations.of(context)!.infectedPlantMessage),
                             color: const Color(0xFF2E7D32),
                             isLoading: snapshot.connectionState == ConnectionState.waiting,
                           ),
@@ -150,9 +160,11 @@ class ResultScreen extends StatelessWidget {
                           _TreatmentCard(
                             title: '🧪 Chemical Treatment',
                             content: treatment?['chemical'],
-                            fallback: isHealthy
-                                ? 'No chemical treatment needed.'
-                                : 'Apply copper-based fungicide.',
+                            fallback: isUnknown
+                                ? 'Try scanning again with better focus.'
+                                : (isHealthy
+                                    ? 'No chemical treatment needed.'
+                                    : 'Apply copper-based fungicide.'),
                             color: const Color(0xFF1565C0),
                             isLoading: snapshot.connectionState == ConnectionState.waiting,
                           ),

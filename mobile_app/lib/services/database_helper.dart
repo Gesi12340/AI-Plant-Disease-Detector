@@ -74,6 +74,51 @@ CREATE TABLE treatments (
         'organic': 'Remove infected plants immediately and use resistant varieties.'
       },
       {
+        'diseaseName': 'Maize Streak Virus',
+        'chemical': 'No direct chemical treatment for the virus. Systemic insecticides may be used to control leafhoppers.',
+        'organic': 'Plant resistant hybrids, remove volunteer plants, and practice early planting.'
+      },
+      {
+        'diseaseName': 'Maize Gray Leaf Spot',
+        'chemical': 'Apply strobilurin or triazole fungicides if infection is significant.',
+        'organic': 'Crop rotation, tillage to bury plant debris, and using resistant varieties.'
+      },
+      {
+        'diseaseName': 'Maize Common Rust',
+        'chemical': 'Fungicides like pyraclostrobin can be effective if applied early.',
+        'organic': 'Use resistant maize hybrids and maintain optimal soil health.'
+      },
+      {
+        'diseaseName': 'Cabbage Black Rot',
+        'chemical': 'Seeds may be treated with hot water or antibiotics. Copper-based fungicides can help suppress spread.',
+        'organic': 'Practice 3-year crop rotation and use disease-free seeds and seedlings.'
+      },
+      {
+        'diseaseName': 'Cabbage Looper',
+        'chemical': 'Apply carbaryl or permethrin if infestation exceeds threshold.',
+        'organic': 'Use Bt (Bacillus thuringiensis) or neem oil sprays. Hand-pick loopers.'
+      },
+      {
+        'diseaseName': 'Cabbage Downy Mildew',
+        'chemical': 'Apply metalaxyl or mancozeb fungicides.',
+        'organic': 'Improve air circulation and avoid overhead watering.'
+      },
+      {
+        'diseaseName': 'Sukuma Wiki Black Spot',
+        'chemical': 'Apply copper-based fungicides during humid periods.',
+        'organic': 'Remove lower leaves, avoid overhead watering, and use crop rotation.'
+      },
+      {
+        'diseaseName': 'Sukuma Wiki Aphids',
+        'chemical': 'Apply malathion or imidacloprid for severe infestations.',
+        'organic': 'Blast with water, use insecticidal soap, or apply neem oil.'
+      },
+      {
+        'diseaseName': 'Sukuma Wiki Powdery Mildew',
+        'chemical': 'Apply sulfur-based fungicides or myclobutanil.',
+        'organic': 'Baking soda spray (1 tsp/quart water) and ensuring good airflow.'
+      },
+      {
         'diseaseName': 'Healthy',
         'chemical': 'No chemical treatment needed.',
         'organic': 'Continue regular watering and fertilization.'
